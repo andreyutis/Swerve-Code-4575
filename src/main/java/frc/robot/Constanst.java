@@ -1,38 +1,57 @@
 package frc.robot;
 
+import frc.robot.Commands.DriveTrain;
+
 public class Constanst {
     public static final double stickDeadband = 0.3;
     
+    public static final class SwerveConstants {
+        /* Ints */
+            public static final int kEncoderResolution = 4096;
+        /* Doubles */
+            public static final double kWheelRadius = 0.0508;
+            public static final double kModuleMaxAngularVelocity = DriveTrain.kMaxAngularSpeed;
+            public static final double kModuleMaxAngularAcceleration = 18.85;//4 * Math.PI; // radians per second squared
+            // FWF - stole this from 6328's code, each gear reduction written out. Final is 6.75. 39.37 converts inches to meters so we can be european fancy
+            //private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
+            public static final double driveAfterEncoderReduction = (4.0 / 39.37) * Math.PI * (1/6.75);
+            public static final double turnAfterEncoderReduction = -1 * (7/150);
+  
+    }
+    
     public static final class AdvancerConstansts {
-        public static final int ADVANCER_MOTOR = 12;
-        public static final int UPPER_ADDRESS_DIO = 0;
-        public static final int LOWER_ADDRESS_DIO = 1;
-
-        public static final double AdvanceToTop_UPPER_BEAM = -1.0;
-        public static final double AdvanceToTop_LOWER_BEAM = -0.7;
-        public static final double AlignToTop_FALSE = 0.2;
-        public static final double AlignToTop_TRUE = -0.1;
-        public static final double AdvanceToShoot = -0.2;
+        /* Ints */
+            public static final int ADVANCER_MOTOR = 12;
+            public static final int UPPER_ADDRESS_DIO = 0;
+            public static final int LOWER_ADDRESS_DIO = 1;
+        /* Doubles */
+            public static final double AdvanceToTop_UPPER_BEAM = -1.0;
+            public static final double AdvanceToTop_LOWER_BEAM = -0.7;
+            public static final double AlignToTop_FALSE = 0.2;
+            public static final double AlignToTop_TRUE = -0.1;
+            public static final double AdvanceToShoot = -0.2;
     }
 
     public static final class ShooterConstansts {
-        public static final int UPPER_ADDRESS = 15;
-        public static final int LOWER_ADDRESS = 16;
-        
-        public static final double shooter1Speed_in_SPEAKER_SHOT = -0.4;
-        public static final double shooter2Speed_in_SPEAKER_SHOT = 1;
-        public static final double shooter1Speed_in_INTAKE = 0.2;
-        public static final double shooter2Speed_in_INTAKE = -0.2;
+        /* Ints */
+            public static final int UPPER_ADDRESS = 15;
+            public static final int LOWER_ADDRESS = 16;
+        /* Doubles */
+            public static final double shooter1Speed_in_SPEAKER_SHOT = -0.4;
+            public static final double shooter2Speed_in_SPEAKER_SHOT = 1;
+            public static final double shooter1Speed_in_INTAKE = 0.2;
+            public static final double shooter2Speed_in_INTAKE = -0.2;
     }
 
     public static final class IntakeConstansts {
-        public static final int INTAKE_MOTOR = 14;
-
-        public static final double INTAKE_LOAD_SPEED_NEO = 0.7;
-        public static final double INTAKE_OUT_SPEED_NEO = -0.4;
-        public static final double INTAKE_LOAD_SPEED_KRACKEN = -0.38;
-        public static final double INTAKE_OUT_SPEED_KRACKEN = 0.4;
-        public static final double JIGGLE_SPEED_NEO = 0.4;
+        /* Ints */
+            public static final int INTAKE_MOTOR = 14;
+        /* Doubles */
+            public static final double INTAKE_LOAD_SPEED_NEO = 0.7;
+            public static final double INTAKE_OUT_SPEED_NEO = -0.4;
+            public static final double INTAKE_LOAD_SPEED_KRACKEN = -0.38;
+            public static final double INTAKE_OUT_SPEED_KRACKEN = 0.4;
+            public static final double JIGGLE_SPEED_NEO = 0.4;
     }
 
     public final static class JoystickConstants{

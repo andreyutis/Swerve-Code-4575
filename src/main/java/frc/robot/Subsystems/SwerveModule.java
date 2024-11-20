@@ -20,17 +20,15 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Preferences;
 //import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constanst;
 import frc.robot.Commands.DriveTrain;
 
 public class SwerveModule extends Command {
-  private static final double kWheelRadius = 0.0508;
-  private static final int kEncoderResolution = 4096;
 
-  private static final double kModuleMaxAngularVelocity = DriveTrain.kMaxAngularSpeed;
-  private static final double kModuleMaxAngularAcceleration =
-      18.85;//4 * Math.PI; // radians per second squared
+  
 
   private final SparkMax m_driveMotor;
   private final SparkMax m_turningMotor;
@@ -44,12 +42,6 @@ public class SwerveModule extends Command {
   private int moduleNumber = 0;
   private final RelativeEncoder m_turningEncoderREV;
 
-  // FWF - stole this from 6328's code, each gear reduction written out. Final is 6.75. 39.37 converts inches to meters so we can be european fancy
-  //private final double driveAfterEncoderReduction = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-  private final double driveAfterEncoderReduction = (4.0 / 39.37) * Math.PI * (1/6.75);
-
-  private final double turnAfterEncoderReduction = -1 * (7/150);
-  
   // Gains are for example purposes only - must be determined for your own robot!
   private final PIDController m_drivePIDController = new PIDController(1, 0, 0);
 
@@ -60,7 +52,7 @@ public class SwerveModule extends Command {
           1,
           0 ,
           new TrapezoidProfile.Constraints(
-              kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
+              Constanst.SwerveConstants.kModuleMaxAngularVelocity, Constanst.SwerveConstants.kModuleMaxAngularAcceleration));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward m_driveFeedforward = new SimpleMotorFeedforward(1, 3);
@@ -124,7 +116,7 @@ switch (moduleNumber) {
   private double encoderValue () {
     var retVal =  m_turningEncoder.getVoltage() / RobotController.getVoltage5V(); // convert voltage to %
     retVal = 2.0 * Math.PI * retVal;    // get % of circle encoder is reading
-//SmartDashboard.putNumber("module " + moduleNumber, retVal);
+    //SmartDashboard.putNumber("module " + moduleNumber, retVal);
 
     retVal = (retVal + encoderOffset) % (2.0 * Math.PI);    // apply offset for this encoder and map it back onto [0, 2pi]
       // might need this so we're in the same range as the pid controller is expecting.
