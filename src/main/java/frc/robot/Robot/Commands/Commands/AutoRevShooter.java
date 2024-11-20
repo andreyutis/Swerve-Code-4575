@@ -1,13 +1,12 @@
 package frc.robot.Robot.Commands.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Robot.Commands.Subsystems.AdvancerSubsystem;
 import frc.robot.Robot.Commands.Subsystems.ShooterSubsystem;
 
-public class ShooterIntake extends Command {
-    private ShooterSubsystem shooter;
-    private boolean isFinished;
-    public ShooterIntake (ShooterSubsystem shooter) {
+public class AutoRevShooter extends Command{
+    ShooterSubsystem shooter;
+    boolean isFinished;
+    public AutoRevShooter(ShooterSubsystem shooter) {
         this.shooter = shooter;
         addRequirements(shooter);
     }
@@ -19,13 +18,11 @@ public class ShooterIntake extends Command {
 
     @Override 
     public void execute() {
-        shooter.Intake();
+        shooter.Shoot();
     }
 
     @Override
-    public void end(boolean interupted) {
-		shooter.Stop();
-    }
+    public void end(boolean interupted) {}
 
     @Override
     public boolean isFinished() {

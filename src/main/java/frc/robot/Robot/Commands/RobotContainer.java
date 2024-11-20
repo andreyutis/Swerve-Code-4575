@@ -13,10 +13,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot.Commands.Commands.AdvancerJiggle;
+import frc.robot.Robot.Commands.Commands.AutoRevShooter;
 import frc.robot.Robot.Commands.Commands.ChangeShot;
 import frc.robot.Robot.Commands.Commands.DriveTrain;
 import frc.robot.Robot.Commands.Commands.IntakeLoad;
@@ -44,6 +46,7 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, JoystickConstants.BACK_BUTTON);
 
   /* Subsystems */
+    private final LimelightSubsystem limelight = new LimelightSubsystem();
     private final AdvancerSubsystem advancer = new AdvancerSubsystem();
     private final ShooterSubsystem shooter = new ShooterSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
@@ -63,10 +66,11 @@ public class RobotContainer {
     configureBindings();
       /* Intake */
         NamedCommands.registerCommand("Intake", new IntakeLoad(intake, advancer));
-        NamedCommands.registerCommand("Outake", new IntakeOut(intake, advancer));
+        NamedCommands.registerCommand("Outtake", new IntakeOut(intake, advancer));
       /* Shooter Commands*/
         NamedCommands.registerCommand("Speaker Shot", new SpeakerShoot(shooter, advancer));
         NamedCommands.registerCommand("Lob shot", new ShooterLob(shooter, advancer));
+        NamedCommands.registerCommand("Rev Shooter", new AutoRevShooter(shooter));
       /* Advancer Commands */   
         NamedCommands.registerCommand("Advancer Jiggle", new AdvancerJiggle(advancer, jiggle_count));
   }
@@ -84,7 +88,10 @@ public class RobotContainer {
     /* Operator Controls */
       /* Shooter Controls */
         new JoystickButton (operator, JoystickConstants.GREEN_BUTTON).onTrue(new SpeakerShoot(shooter, advancer));
-        new Trigger (new JoystickButton(operator, JoystickConstants.GREEN_BUTTON)).and(new Trigger(() -> (advancer.LowerBeam.get()))).onTrue(new SequentialCommandGroup(new ShooterIntake(shooter, advancer), new RetractToBottom(advancer)));
+        new Trigger (new JoystickButton(operator, JoystickConstants.GREEN_BUTTON)).and(
+          new Trigger(() -> (advancer.LowerBeam.get()))).onTrue(new ParallelCommandGroup(new ShooterIntake(shooter), new RetractToBottom(advancer)));
+        new Trigger(() -> limelight.InRange(5)).and(new Trigger(() -> (advancer.LowerBeam.get())))
+          .onTrue(new AutoRevShooter(shooter));
         new JoystickButton (operator, JoystickConstants.BLUE_BUTTON).onTrue(new ShooterLob(shooter, advancer));
         new JoystickButton (operator, JoystickConstants.YELLOW_BUTTON).onTrue(new ChangeShot(shooter, advancer));
       /* Intake Controls */
