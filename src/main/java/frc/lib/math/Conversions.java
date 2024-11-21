@@ -1,4 +1,4 @@
-package frc.lib.util.math;
+package frc.lib.math;
 
 public class Conversions {
        
