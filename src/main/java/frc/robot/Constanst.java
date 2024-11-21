@@ -34,7 +34,7 @@ private final Translation2d m_frontRightLocation = new Translation2d(0.45085, -0
 private final Translation2d m_backLeftLocation = new Translation2d(-0.45085, 0.45085);
 private final Translation2d m_backRightLocation = new Translation2d(-0.45085, -0.45085);
 */
-// These numbers are for the wierd rectangle swerve
+// These numbers are for the weird rectangle swerve
 //0.2032 X
 //0.2794 Y
         public static final Translation2d m_frontLeftLocation = new Translation2d(0.2032, 0.2794);

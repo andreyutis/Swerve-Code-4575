@@ -10,6 +10,8 @@ import com.studica.frc.jni.AHRSJNI;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,6 +33,15 @@ import frc.robot.Subsystems.SwerveModule;
 
 /** Represents a swerve drive style drivetrain. */
 public class DriveTrain extends SubsystemBase {
+    // Load the RobotConfig from the GUI settings. You should probably
+    // store this in your Constants file
+    RobotConfig config;
+    // try{
+    //   config = RobotConfig.fromGUISettings();
+    // } catch (Exception e) {
+    //   // Handle exception as needed
+    //   e.printStackTrace();
+    // }
   public static final double kMaxSpeed = 4.47; // was 3 meters per second
   public static final double kMaxAngularSpeed = 4.41 * 2 * Math.PI; // was Math.PI for 1/2 rotation per second
   
@@ -85,10 +96,10 @@ private double rot_cur;
     // SmartDashboard.putNumber("I translate", Itranslate);
 
     m_gyro.reset();
-    /*AutoBuilder.configure(
+    AutoBuilder.configure(
       this::getPose, // Robot pose supplier
       this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-      this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+      this::getSpeed, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
       (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
       new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
               new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
@@ -107,7 +118,7 @@ private double rot_cur;
         return false;
       },
     this // Reference to this subsystem to set requirements
-);*/
+);
   }
 
   public void ResetDrives () {
@@ -191,7 +202,7 @@ SmartDashboard.putString("gyro", m_gyro.getRotation2d().toString());
   
   }
   
-  /* adding some gyro output so other claeese don't need to access it directly */
+  /* adding some gyro output so other classes don't need to access it directly */
   public double getYaw() {
     return (m_gyro.getAngle());
   }

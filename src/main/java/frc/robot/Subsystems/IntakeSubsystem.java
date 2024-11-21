@@ -19,7 +19,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean Load () {        // not named intake because that's the constructor.
         intake.set(Constanst.IntakeConstansts.INTAKE_LOAD_SPEED_NEO);  // -0.38 for kraken
-        // this is beacuse we tested this so that the intake and advancer would be running at the same speed
+        // this is because we tested this so that the intake and advancer would be running at the same speed
 
         return (true);
     }
