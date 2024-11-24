@@ -21,6 +21,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.ImmutableLinearVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,15 +36,6 @@ import frc.robot.Subsystems.SwerveModule;
 
 /** Represents a swerve drive style drivetrain. */
 public class DriveTrain extends SubsystemBase {
-    // Load the RobotConfig from the GUI settings. You should probably
-    // store this in your Constants file
-    RobotConfig config;
-    // try{
-    //   config = RobotConfig.fromGUISettings();
-    // } catch (Exception e) {
-    //   // Handle exception as needed
-    //   e.printStackTrace();
-    // }
   public static final double kMaxSpeed = 4.47; // was 3 meters per second
   public static final double kMaxAngularSpeed = 4.41 * 2 * Math.PI; // was Math.PI for 1/2 rotation per second
   
@@ -96,6 +90,8 @@ private double rot_cur;
     // SmartDashboard.putNumber("I translate", Itranslate);
 
     m_gyro.reset();
+    try{
+      RobotConfig config = RobotConfig.fromGUISettings();
     AutoBuilder.configure(
       this::getPose, // Robot pose supplier
       this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
@@ -119,6 +115,9 @@ private double rot_cur;
       },
     this // Reference to this subsystem to set requirements
 );
+}catch(Exception e){
+  DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+}
   }
 
   public void ResetDrives () {

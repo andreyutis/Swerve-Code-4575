@@ -4,10 +4,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.Joystick;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -52,7 +53,11 @@ public class RobotContainer {
     private final IntakeSubsystem intake = new IntakeSubsystem();
     private final DriveTrain s_swerve = new DriveTrain();
 
+  /* Pathplanner stuff */
+  private final SendableChooser<Command> autoChooser;
+
   public RobotContainer() {
+    autoChooser = AutoBuilder.buildAutoChooser();
     double jiggle_count = SmartDashboard.getNumber("Advancer Jiggle Number Auto", 5);
     s_swerve.setDefaultCommand(
       new TelopSwerve(
@@ -73,6 +78,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("Rev Shooter", new AutoRevShooter(shooter_));
       /* Advancer Commands */   
         NamedCommands.registerCommand("Advancer Jiggle", new AdvancerJiggle(advancer, jiggle_count));
+
+        SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   public void teleopInit() {
@@ -102,6 +109,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autoChooser.getSelected();
   }
 }
