@@ -1,6 +1,5 @@
 package frc.lib.util;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 
 public class SwerveModuleConstants {
     public final int driveMotorID;
