@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constanst;
+import frc.robot.MetricsProvider;
 import frc.robot.Subsystems.SwerveModule;
 
 
@@ -168,6 +169,10 @@ SmartDashboard.putString("gyro", m_gyro.getRotation2d().toString());
     xSpeed_cur = xSpeed;
     ySpeed_cur = ySpeed;
     rot_cur = rot;
+
+    //TODO we probably need to publish the updated location from here once we get it to work
+    //updateOdometry();
+    //MetricsProvider.updateLocation(getPose());
   }
 
   public ChassisSpeeds getSpeed() {
