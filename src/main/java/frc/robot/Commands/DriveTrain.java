@@ -4,15 +4,15 @@
 
 package frc.robot.Commands;
 
-import java.io.ObjectInputFilter.Config;
-import java.util.function.DoublePredicate;
-import com.studica.frc.jni.AHRSJNI;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,21 +20,21 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.ImmutableLinearVelocity;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constanst;
+import frc.robot.MetricsProvider;
 import frc.robot.Subsystems.SwerveModule;
 
 
 
 /** Represents a swerve drive style drivetrain. */
+@Component
 public class DriveTrain extends SubsystemBase {
   public static final double kMaxSpeed = 4.47; // was 3 meters per second
   public static final double kMaxAngularSpeed = 4.41 * 2 * Math.PI; // was Math.PI for 1/2 rotation per second
@@ -80,6 +80,11 @@ private double rot_cur;
           new Pose2d(new Translation2d(),new Rotation2d(Units.degreesToRadians(180)))
           );
 
+  private DifferentialDrivetrainSim simDrive;
+
+  @Autowired
+  private MetricsProvider metricsProvider;
+
   public DriveTrain() {
     // SmartDashboard.putNumber("P rotate", Protate);
     // SmartDashboard.putNumber("D rotate", Drotate);
@@ -88,6 +93,20 @@ private double rot_cur;
     // SmartDashboard.putNumber("P translate", Ptranslate);
     // SmartDashboard.putNumber("D translate", Dtranslate);
     // SmartDashboard.putNumber("I translate", Itranslate);
+
+    simDrive = new DifferentialDrivetrainSim(
+                DCMotor.getNEO(2), // 2 NEO motors on each side of the drivetrain.
+                7.29, // 7.29:1 gearing reduction.
+                7.5, // MOI of 7.5 kg m^2 (from CAD model).
+                60.0, // The mass of the robot is 60 kg.
+                Units.inchesToMeters(3), // The robot uses 3" radius wheels.
+                0.7112, // The track width is 0.7112 meters.
+                // The standard deviations for measurement noise:
+                // x and y: 0.001 m
+                // heading: 0.001 rad
+                // l and r velocity: 0.1 m/s
+                // l and r position: 0.005 m
+                VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005));
 
     m_gyro.reset();
     try{
@@ -168,10 +187,6 @@ SmartDashboard.putString("gyro", m_gyro.getRotation2d().toString());
     xSpeed_cur = xSpeed;
     ySpeed_cur = ySpeed;
     rot_cur = rot;
-
-    //TODO we probably need to publish the updated location from here once we get it to work
-    //updateOdometry();
-    //MetricsProvider.updateLocation(getPose());
   }
 
   public ChassisSpeeds getSpeed() {
@@ -209,4 +224,18 @@ SmartDashboard.putString("gyro", m_gyro.getRotation2d().toString());
   public double getYaw() {
     return (m_gyro.getAngle());
   }
+
+  @Override
+  public void simulationPeriodic() {
+      super.simulationPeriodic();
+
+      //FIXME this is probably not the right speed calculation.. need to figure out where to get the speed
+      m_frontLeft.getDriveMotorSim().iterate(xSpeed_cur + ySpeed_cur, m_frontLeft.getDriveMotorSim().getBusVoltage(), 0.02);
+      m_frontRight.getDriveMotorSim().iterate(xSpeed_cur + ySpeed_cur, m_frontRight.getDriveMotorSim().getBusVoltage(), 0.02);
+
+      simDrive.setInputs(m_frontLeft.getDriveMotorSim().getAppliedOutput() * m_frontLeft.getDriveMotorSim().getBusVoltage(),  m_frontRight.getDriveMotorSim().getAppliedOutput() * m_frontRight.getDriveMotorSim().getBusVoltage());
+      simDrive.update(0.02);
+      
+      metricsProvider.updateLocation(simDrive.getPose());
+    }
 }
