@@ -52,12 +52,14 @@ public class RobotContainer {
     private final AdvancerSubsystem advancer = new AdvancerSubsystem();
     private final ShooterSubsystem shooter_ = new ShooterSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
-    private final DriveTrain s_swerve = new DriveTrain();
+    private final DriveTrain s_swerve;
 
   /* Pathplanner stuff */
   private final SendableChooser<Command> autoChooser;
 
-  public RobotContainer() {
+  public RobotContainer(DriveTrain s_swerve) {
+    this.s_swerve = s_swerve;
+    
     autoChooser = AutoBuilder.buildAutoChooser();
     double jiggle_count = SmartDashboard.getNumber("Advancer Jiggle Number Auto", 5);
     s_swerve.setDefaultCommand(

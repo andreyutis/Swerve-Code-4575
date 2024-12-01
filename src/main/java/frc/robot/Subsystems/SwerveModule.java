@@ -4,8 +4,8 @@
 
 package frc.robot.Subsystems;
 
-import com.revrobotics.jni.CANSparkJNI;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkSim;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
@@ -15,17 +15,14 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Preferences;
-//import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constanst;
-import frc.robot.Commands.DriveTrain;
 
 public class SwerveModule extends Command {
 
@@ -33,6 +30,7 @@ public class SwerveModule extends Command {
 
   private final SparkMax m_driveMotor;
   private final SparkMax m_turningMotor;
+  private final SparkSim driveMotorSim;
 
 
   private final RelativeEncoder m_driveEncoder;
@@ -69,6 +67,7 @@ public class SwerveModule extends Command {
   public SwerveModule(SwerveModuleConstants moduleConstants) {
     m_driveMotor = new SparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
     m_driveMotor.setInverted (true);
+    driveMotorSim = new SparkSim(m_driveMotor, DCMotor.getNEO(1));
     m_turningMotor = new SparkMax(moduleConstants.angleMotorID, MotorType.kBrushless);
     m_turningMotor.setInverted (true);
 
@@ -114,6 +113,11 @@ switch (moduleNumber) {
   break;
 }
   }
+
+  public SparkSim getDriveMotorSim() {
+    return driveMotorSim;
+  }
+
   private double encoderValue () {
     var retVal =  m_turningEncoder.getVoltage() / RobotController.getVoltage5V(); // convert voltage to %
     retVal = 2.0 * Math.PI * retVal;    // get % of circle encoder is reading
@@ -194,4 +198,5 @@ switch (moduleNumber) {
     m_turningMotor.setVoltage(turnOutput + turnFeedforward);
     
   }
+  
 }
