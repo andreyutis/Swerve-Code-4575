@@ -1,5 +1,7 @@
 package frc.robot.Subsystems;
 
+import org.springframework.stereotype.Component;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -7,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constanst;
 
+@Component
 public class IntakeSubsystem extends SubsystemBase {
     //private TalonFX intake;
     private SparkMax intake;

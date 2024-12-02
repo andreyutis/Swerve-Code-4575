@@ -4,16 +4,15 @@
 
 package frc.robot;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -33,57 +32,31 @@ import frc.robot.Constanst.JoystickConstants;
 import frc.robot.Subsystems.*;
 
 @Component
-public class RobotContainer {
+public class RobotContainer implements InitializingBean {
   
   /* Controllers */
-    private final Joystick driver = new Joystick(JoystickConstants.DRIVER_USB);
-    private final Joystick operator = new Joystick(JoystickConstants.OPERATOR_USB);
+  private final Joystick driver = new Joystick(JoystickConstants.DRIVER_USB);
+  private final Joystick operator = new Joystick(JoystickConstants.OPERATOR_USB);
 
   /* Drive Controls */
-    private final int translationAxis = JoystickConstants.LEFT_Y_AXIS;
-    private final int strafeAxis = JoystickConstants.LEFT_X_AXIS;
-    private final int rotationAxis = JoystickConstants.RIGHT_X_AXIS;
+  private final int translationAxis = JoystickConstants.LEFT_Y_AXIS;
+  private final int strafeAxis = JoystickConstants.LEFT_X_AXIS;
+  private final int rotationAxis = JoystickConstants.RIGHT_X_AXIS;
 
   /* Driver Buttons */
-    private final JoystickButton zeroGyro = new JoystickButton(driver, JoystickConstants.BACK_BUTTON);
+  private final JoystickButton zeroGyro = new JoystickButton(driver, JoystickConstants.BACK_BUTTON);
 
   /* Subsystems */
-    private final LimelightSubsystem limelight = new LimelightSubsystem();
-    private final AdvancerSubsystem advancer = new AdvancerSubsystem();
-    private final ShooterSubsystem shooter_ = new ShooterSubsystem();
-    private final IntakeSubsystem intake = new IntakeSubsystem();
-    private final DriveTrain s_swerve;
-
-  /* Pathplanner stuff */
-  private final SendableChooser<Command> autoChooser;
-
-  public RobotContainer(DriveTrain s_swerve) {
-    this.s_swerve = s_swerve;
-    
-    autoChooser = AutoBuilder.buildAutoChooser();
-    double jiggle_count = SmartDashboard.getNumber("Advancer Jiggle Number Auto", 5);
-    s_swerve.setDefaultCommand(
-      new TelopSwerve(
-        s_swerve,
-        () -> -driver.getRawAxis(translationAxis), 
-        () -> -driver.getRawAxis(strafeAxis), 
-        () -> -driver.getRawAxis(rotationAxis)
-        )
-    );
-    
-    configureBindings();
-      /* Intake */
-        NamedCommands.registerCommand("Intake", new IntakeLoad(intake, advancer));
-        NamedCommands.registerCommand("Outtake", new IntakeOut(intake, advancer));
-      /* Shooter Commands*/
-        NamedCommands.registerCommand("Speaker Shot", new SpeakerShoot(shooter_, advancer));
-        NamedCommands.registerCommand("Lob shot", new ShooterLob(shooter_, advancer));
-        NamedCommands.registerCommand("Rev Shooter", new AutoRevShooter(shooter_));
-      /* Advancer Commands */   
-        NamedCommands.registerCommand("Advancer Jiggle", new AdvancerJiggle(advancer, jiggle_count));
-
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-  }
+  @Autowired
+  private LimelightSubsystem limelight;
+  @Autowired
+  private AdvancerSubsystem advancer;
+  @Autowired
+  private ShooterSubsystem shooter_;
+  @Autowired
+  private IntakeSubsystem intake;
+  @Autowired
+  private DriveTrain s_swerve;
 
   public void teleopInit() {
     shooter_.Stop();
@@ -111,7 +84,31 @@ public class RobotContainer {
         new JoystickButton (operator, JoystickConstants.START_BUTTON).onTrue(new AdvancerJiggle(advancer, SmartDashboard.getNumber("Advancer Jiggle Number Teleop", 5)));
   }
 
-  public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+  private void configureNamedCommands() {
+    /* Intake */
+    NamedCommands.registerCommand("Intake", new IntakeLoad(intake, advancer));
+    NamedCommands.registerCommand("Outtake", new IntakeOut(intake, advancer));
+    /* Shooter Commands */
+    NamedCommands.registerCommand("Speaker Shot", new SpeakerShoot(shooter_, advancer));
+    NamedCommands.registerCommand("Lob shot", new ShooterLob(shooter_, advancer));
+    NamedCommands.registerCommand("Rev Shooter", new AutoRevShooter(shooter_));
+    /* Advancer Commands */
+    double jiggle_count = SmartDashboard.getNumber("Advancer Jiggle Number Auto", 5);
+    NamedCommands.registerCommand("Advancer Jiggle", new AdvancerJiggle(advancer, jiggle_count));
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    s_swerve.setDefaultCommand(
+      new TelopSwerve(
+        s_swerve,
+        () -> -driver.getRawAxis(translationAxis), 
+        () -> -driver.getRawAxis(strafeAxis), 
+        () -> -driver.getRawAxis(rotationAxis)
+        )
+    );
+
+    configureBindings();
+    configureNamedCommands();
   }
 }

@@ -5,8 +5,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constanst;
 
+import org.springframework.stereotype.Component;
+
 import com.revrobotics.spark.SparkMax;
 
+@Component
 public class ShooterSubsystem extends SubsystemBase{
     private SparkMax upperShooter;
     private SparkMax lowerShooter;
